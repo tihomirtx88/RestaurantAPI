@@ -23,3 +23,14 @@ def login():
         "access_token": access_token,
         "user_id": user.id
     }), 200
+
+@auth_bp.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    return jsonify({
+        "email": user.email,
+        "id": user.id
+    })
