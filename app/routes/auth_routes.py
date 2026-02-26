@@ -5,6 +5,24 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 
 auth_bp = Blueprint("auth", __name__)
 
+@auth_bp.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
+
+    if not data or not data.get("email") or not data.get("password"):
+        return jsonify({"message": "Email and password required"}), 400
+
+    if User.query.filter_by(email=data["email"]).first():
+        return jsonify({"message": "Email already exists"}), 400
+
+    user = User(email=data["email"])
+    user.set_password(data["password"])
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"message": "User registered successfully"}), 201
+
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -17,7 +35,7 @@ def login():
     if not user or not user.check_password(data["password"]):
         return jsonify({"message": "Invalid credentials"}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
 
     return jsonify({
         "access_token": access_token,
@@ -28,7 +46,7 @@ def login():
 @jwt_required()
 def profile():
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = User.query.get(int(user_id))
 
     return jsonify({
         "email": user.email,
