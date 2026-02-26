@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy import True_
+
 from app.extensions import db
+from app.models.token_blocklist import TokenBlocklist
 from app.models.user import User
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token, get_jwt
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -36,10 +39,12 @@ def login():
         return jsonify({"message": "Invalid credentials"}), 401
 
     access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
 
     return jsonify({
         "access_token": access_token,
-        "user_id": user.id
+        "user_id": user.id,
+        "refresh_token": refresh_token
     }), 200
 
 @auth_bp.route("/profile", methods=["GET"])
@@ -52,3 +57,23 @@ def profile():
         "email": user.email,
         "id": user.id
     })
+
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    user_id = get_jwt_identity()
+    new_access_token = create_access_token(identity=user_id)
+
+    return jsonify({
+        "access_token": new_access_token
+    }), 200
+
+@auth_bp.route("/logout", methods=["POST"])
+@jwt_required(refresh=True)
+def logout():
+    jti = get_jwt()["jti"]
+
+    db.session.add(TokenBlocklist(jti=jti))
+    db.session.commit()
+
+    return jsonify({"message": "Logged out"}), 200
