@@ -7,6 +7,7 @@ from .models.user import User
 from .models.token_blocklist import TokenBlocklist
 from .models.category import Category
 from .models.menu_item import MenuItem
+from .routes.menu_routes import menu_bp
 
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
@@ -29,5 +30,6 @@ def create_app():
         return {"message": "Restaurant API running 🚀"}
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(menu_bp)
 
     return app
