@@ -1,10 +1,12 @@
 from flask import Flask
 from .config import Config
 from .extensions import db, migrate, jwt, bcrypt, mail
-from .models.user import User
 from app.routes.auth_routes import auth_bp
 
-from app.models.token_blocklist import TokenBlocklist
+from .models.user import User
+from .models.token_blocklist import TokenBlocklist
+from .models.category import Category
+from .models.menu_item import MenuItem
 
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
