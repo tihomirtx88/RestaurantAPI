@@ -7,6 +7,8 @@ from .models.user import User
 from .models.token_blocklist import TokenBlocklist
 from .models.category import Category
 from .models.menu_item import MenuItem
+from .models.reservation import Reservation
+from .models.review import Review
 from .routes.menu_routes import menu_bp
 
 @jwt.token_in_blocklist_loader

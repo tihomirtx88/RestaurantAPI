@@ -1,0 +1,12 @@
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from app.models.reservation import Reservation
+from marshmallow import fields
+
+class ReservationSchema(SQLAlchemyAutoSchema):
+
+    user = fields.String(attribute="user.email")
+
+    class Meta:
+        model = Reservation
+        load_instance = True
+        include_fk = True
