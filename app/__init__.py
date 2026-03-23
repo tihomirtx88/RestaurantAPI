@@ -9,6 +9,8 @@ from .models.category import Category
 from .models.menu_item import MenuItem
 from .models.reservation import Reservation
 from .models.review import Review
+
+from app.routes.category_routes import category_bp
 from .routes.menu_routes import menu_bp
 
 @jwt.token_in_blocklist_loader
@@ -32,6 +34,7 @@ def create_app():
         return {"message": "Restaurant API running 🚀"}
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(category_bp)
     app.register_blueprint(menu_bp)
 
     return app
