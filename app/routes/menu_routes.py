@@ -4,6 +4,7 @@ from app.models.category import Category
 from app.shcemas.menu_schema import MenuItemSchema
 from app.extensions import db
 from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
 
 menu_bp = Blueprint("menu", __name__, url_prefix="/api/menu")
 
@@ -77,3 +78,22 @@ def get_filter_menu():
         "page": paginated.page,
         "pages": paginated.pages
     }, 200
+
+@menu_bp.route("/", methods=["POST"])
+@jwt_required()
+def create_menu_item():
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No input data"}), 400
+
+    try:
+        item = menu_schema.load(data)
+    except ValidationError as err:
+        return jsonify(err.messages), 400
+
+    db.session.add(item)
+    db.session.commit()
+
+    return menu_schema.dump(item), 201
