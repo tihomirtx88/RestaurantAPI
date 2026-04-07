@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="268c390a-c076-4fcd-b0b1-817974c5d8ba" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/routes/review_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/review_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/reservation_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shcemas/reservation_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/shcemas/reservation_schema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
