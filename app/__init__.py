@@ -13,6 +13,7 @@ from .models.review import Review
 from app.routes.category_routes import category_bp
 from .routes.review_routes import review_bp
 from .routes.menu_routes import menu_bp
+from .routes.reservation_routes import reservation_bp
 
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
@@ -38,5 +39,6 @@ def create_app():
     app.register_blueprint(category_bp)
     app.register_blueprint(menu_bp)
     app.register_blueprint(review_bp)
+    app.register_blueprint(reservation_bp)
 
     return app
