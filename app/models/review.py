@@ -4,8 +4,6 @@ from datetime import datetime
 class Review(db.Model):
     __tablename__ = "reviews"
 
-    id = db.Column
-
     id = db.Column(db.Integer, primary_key=True)
 
     rating = db.Column(db.Integer, nullable=False)

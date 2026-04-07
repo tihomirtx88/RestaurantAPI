@@ -11,6 +11,7 @@ from .models.reservation import Reservation
 from .models.review import Review
 
 from app.routes.category_routes import category_bp
+from .routes.review_routes import review_bp
 from .routes.menu_routes import menu_bp
 
 @jwt.token_in_blocklist_loader
@@ -36,5 +37,6 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(category_bp)
     app.register_blueprint(menu_bp)
+    app.register_blueprint(review_bp)
 
     return app
