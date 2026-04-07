@@ -33,3 +33,10 @@ def create_review():
     db.session.commit()
 
     return review_schema.dump(review), 201
+
+@review_bp.route("/menu/<int:menu_id>", methods=["GET"])
+def get_reviews(menu_id):
+
+    reviews = Review.query.filter_by(menu_item_id=menu_id).all()
+
+    return reviews_schema.dump(reviews), 200
