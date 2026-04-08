@@ -13,3 +13,4 @@ class ReservationSchema(SQLAlchemyAutoSchema):
         load_instance = True
         include_fk = True
         sqla_session = db.session
+

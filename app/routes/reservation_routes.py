@@ -32,3 +32,13 @@ def create_reservation():
     db.session.commit()
 
     return reservation_schema.dump(reservation), 201
+
+@reservation_bp.route("/my", methods=["GET"])
+@jwt_required()
+def get_my_reservations():
+
+    user_id = get_jwt_identity()
+
+    reservations = Reservation.query.filter_by(user_id=user_id).all()
+
+    return reservations_schema.dump(reservations), 200
