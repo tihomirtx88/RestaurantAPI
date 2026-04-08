@@ -9,6 +9,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(20), default="user")
 
     def set_password(self, raw_password):
         self.password = bcrypt.generate_password_hash(raw_password).decode("utf-8")
