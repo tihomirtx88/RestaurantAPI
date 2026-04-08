@@ -5,7 +5,8 @@ from app.extensions import db
 
 class ReservationSchema(SQLAlchemyAutoSchema):
 
-    user = fields.String(attribute="user.email")
+    user = fields.String(attribute="user.email", dump_only=True)
+    user_id = fields.Integer(dump_only=True)
 
     class Meta:
         model = Reservation
