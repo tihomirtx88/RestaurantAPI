@@ -6,6 +6,8 @@ from app.extensions import db
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 
+from app.utilis.permissions import role_required
+
 menu_bp = Blueprint("menu", __name__, url_prefix="/api/menu")
 
 # Schema instances
@@ -81,6 +83,7 @@ def get_filter_menu():
 
 @menu_bp.route("/", methods=["POST"])
 @jwt_required()
+@role_required("admin")
 def create_menu_item():
 
     data = request.get_json()

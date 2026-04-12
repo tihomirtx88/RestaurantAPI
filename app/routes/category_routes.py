@@ -3,6 +3,7 @@ from app.models.category import Category
 from app.shcemas.category_schema import CategorySchema
 from app.extensions import db
 from marshmallow import ValidationError
+from app.utilis.permissions import role_required
 
 category_bp = Blueprint("categories", __name__, url_prefix="/api/categories")
 
@@ -23,6 +24,7 @@ def get_categories():
 
 
 @category_bp.route("/", methods=["POST"])
+@role_required("admin")
 def create_category():
     data = request.get_json()
 
