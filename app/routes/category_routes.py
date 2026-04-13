@@ -1,9 +1,11 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from app.models.category import Category
 from app.shcemas.category_schema import CategorySchema
 from app.extensions import db
 from marshmallow import ValidationError
 from app.utilis.permissions import role_required
+
+from app.utilis.app_error import AppError
 
 category_bp = Blueprint("categories", __name__, url_prefix="/api/categories")
 
@@ -29,15 +31,14 @@ def create_category():
     data = request.get_json()
 
     if not data:
-        return jsonify({"error": "No input data"}), 400
+        return AppError("No input data", 400)
 
     try:
         category = category_schema.load(data)
     except ValidationError as err:
-        return jsonify(err.messages), 400
+        raise AppError(err.messages, 400)
     except Exception as e:
-        print(e)
-        return jsonify({"error": str(e)}), 400
+        raise e
 
     db.session.add(category)
     db.session.commit()
