@@ -1,9 +1,11 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.reservation import Reservation
 from app.shcemas.reservation_schema import ReservationSchema
 from app.extensions import db
 from marshmallow import ValidationError
+
+from app.utilis.error_handler import AppError
 
 reservation_bp = Blueprint("reservations", __name__, url_prefix="/api/reservations")
 
@@ -18,14 +20,14 @@ def create_reservation():
     data = request.get_json()
 
     if not data:
-        return jsonify({"error": "No input data"}), 400
+        raise AppError("No input data", 400)
 
     try:
         reservation = reservation_schema.load(data)
         reservation.user_id = user_id
 
     except ValidationError as err:
-        return jsonify(err.messages), 400
+        raise AppError(err.messages, 400)
 
 
     db.session.add(reservation)
