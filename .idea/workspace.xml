@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="268c390a-c076-4fcd-b0b1-817974c5d8ba" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/utilis/error_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utilis/error_handler.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

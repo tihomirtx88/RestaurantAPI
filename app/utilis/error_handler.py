@@ -3,7 +3,7 @@ from app.utilis.app_error import AppError
 
 def register_error_handlers(app):
 
-    #Custom error 
+    #Custom error
     @app.errorhandler(AppError)
     def handle_app_error(error):
         return jsonify({

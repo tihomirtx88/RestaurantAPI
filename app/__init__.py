@@ -15,6 +15,8 @@ from .routes.review_routes import review_bp
 from .routes.menu_routes import menu_bp
 from .routes.reservation_routes import reservation_bp
 
+from app.utilis.error_handler import register_error_handlers
+
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
@@ -30,6 +32,9 @@ def create_app():
     jwt.init_app(app)
     bcrypt.init_app(app)
     mail.init_app(app)
+
+    # Register Global Error Handler
+    register_error_handlers(app)
 
     @app.route("/")
     def home():
