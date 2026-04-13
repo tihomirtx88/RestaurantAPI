@@ -3,12 +3,18 @@ from app.models.reservation import Reservation
 from app.models.review import Review
 from app.models.menu_item import MenuItem
 from app.extensions import db
-from app.utilis.error_handler import AppError
+from app.utilis.cache import get_cache, set_cache
 
 stats_bp = Blueprint("stats", __name__, url_prefix="/api/stats")
 
 @stats_bp.route("/", methods=["GET"])
 def get_stats():
+
+    cached = get_cache("stats")
+
+    if cached:
+        return cached, 200
+
     # Total reservation
     total_reservations = Reservation.query.count()
     # Avg rating
@@ -32,21 +38,22 @@ def get_stats():
         db.func.date(Reservation.reservation_date)
     ).all()
 
-    return {
+
+    response = {
         "total_reservations": total_reservations,
         "average_rating": float(avg_rating) if avg_rating else 0,
         "popular_items": [
-            {
-                "name": item[0],
-                "reviews": item[1]
-            }
+            {"name": item[0], "reviews": item[1]}
             for item in popular_items
         ],
         "reservations_per_day": [
-            {
-                "date": str(day[0]),
-                "count": day[1]
-            }
+            {"date": str(day[0]), "count": day[1]}
             for day in reservations_per_day
         ]
     }
+
+    set_cache("stats", response, ttl=60)
+
+    return response, 200
+
+
