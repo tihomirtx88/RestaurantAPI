@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from app.models.menu_item import MenuItem
 from app.models.category import Category
 from app.shcemas.menu_schema import MenuItemSchema
 from app.extensions import db
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
+
+from app.utilis.error_handler import AppError
 
 from app.utilis.permissions import role_required
 
@@ -28,7 +30,7 @@ def get_menu():
         category = Category.query.filter_by(name=category_name.capitalize()).first()
 
         if not query:
-            return jsonify({"message": "Category not found"}), 404
+            raise AppError("Category not found", 404)
 
         query = query.filter_by(category_id=category.id)
 
@@ -63,7 +65,10 @@ def get_filter_menu():
         query = query.filter(MenuItem.price >= float(min_price))
 
     if max_price:
-        query = query.filter(MenuItem.price <= float(max_price))
+        try:
+            query = query.filter(MenuItem.price <= float(max_price))
+        except ValueError:
+            raise AppError("Invalid max_price", 400)
 
     if sort == "price":
         query = query.order_by(MenuItem.price)
@@ -89,12 +94,12 @@ def create_menu_item():
     data = request.get_json()
 
     if not data:
-        return jsonify({"error": "No input data"}), 400
+        raise AppError("No input data", 400)
 
     try:
         item = menu_schema.load(data)
     except ValidationError as err:
-        return jsonify(err.messages), 400
+        raise AppError(err.messages, 400)
 
     db.session.add(item)
     db.session.commit()
