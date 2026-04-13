@@ -14,6 +14,7 @@ from app.routes.category_routes import category_bp
 from .routes.review_routes import review_bp
 from .routes.menu_routes import menu_bp
 from .routes.reservation_routes import reservation_bp
+from .routes.stats_routes import stats_bp
 
 from app.utilis.error_handler import register_error_handlers
 
@@ -45,5 +46,6 @@ def create_app():
     app.register_blueprint(menu_bp)
     app.register_blueprint(review_bp)
     app.register_blueprint(reservation_bp)
+    app.register_blueprint(stats_bp)
 
     return app
