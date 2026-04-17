@@ -23,8 +23,14 @@ def check_if_token_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
     return TokenBlocklist.query.filter_by(jti=jti).first() is not None
 
-def create_app():
+def create_app(config=None):
     app = Flask(__name__)
+
+    if config == "testing":
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+        app.config["TESTING"] = True
+        app.config["JWT_SECRET_KEY"] = "test-secret"
+
     app.config.from_object(Config)
 
     # Initialize extensions

@@ -1,12 +1,15 @@
+import uuid
+
 import pytest
 from app import create_app
 from app.extensions import db
 from app.models.user import User
+from app.models import *
 
 # Creating test evnvirement
 @pytest.fixture
 def app():
-   app = create_app()
+   app = create_app("testing")
 
    app.config.update({
        "TESTING": True,
@@ -33,7 +36,10 @@ def client(app):
 # Creating user
 @pytest.fixture
 def test_user(app):
-    user = User(email="admin3@admin.com")
+    user = User(
+        email=f"admin_{uuid.uuid4()}@admin.com",  # ← FIX
+        role="admin"
+    )
     user.set_password("123456")
 
     db.session.add(user)
@@ -48,8 +54,10 @@ def test_user(app):
 # Login user and takes token
 def auth_token(client, test_user):
     response = client.post("/api/auth/login", json={
-        "email": "admin3@admin.com",
+          "email": test_user.email,
         "password": "123456"
     })
+
+    print("LOGIN:", response.status_code, response.get_json())
 
     return response.get_json()["access_token"]
