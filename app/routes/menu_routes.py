@@ -1,3 +1,5 @@
+from functools import partial
+
 from flask import Blueprint, request
 from app.models.menu_item import MenuItem
 from app.models.category import Category
@@ -107,3 +109,25 @@ def create_menu_item():
     db.session.commit()
 
     return menu_schema.dump(item), 201
+
+# -------------------------
+# UPDATE MENU ITEM
+# -------------------------
+@menu_bp.route("/<int:id>", methods=["PATCH"])
+@jwt_required()
+@role_required("admin")
+def update_menu_item(id):
+
+    item = MenuItem.query.get_or_404(id);
+    data = request.get_json()
+
+    try:
+        updated = menu_schema.load(data, partial=True)
+    except ValidationError as err:
+        raise AppError(err.messages, 400)
+
+    for key, value in data.items():
+        setattr(item, key, value)
+
+    db.session.commit()
+    return menu_schema.dump(item), 200
