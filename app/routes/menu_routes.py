@@ -27,9 +27,11 @@ def get_menu():
     query = MenuItem.query
 
     if category_name:
-        category = Category.query.filter_by(name=category_name.capitalize()).first()
+        category = Category.query.filter(
+            db.func.lower(Category.name) == category_name.lower()
+        ).first()
 
-        if not query:
+        if not category:
             raise AppError("Category not found", 404)
 
         query = query.filter_by(category_id=category.id)
@@ -55,8 +57,8 @@ def get_filter_menu():
     query = MenuItem.query
 
     if category_name:
-        category = Category.query.filter_by(
-            name=category_name.capitalize()
+        category = Category.query.filter(
+            db.func.lower(Category.name) == category_name.lower()
         ).first()
         if category:
             query = query.filter_by(category_id=category.id)

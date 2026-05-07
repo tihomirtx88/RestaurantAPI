@@ -9,7 +9,7 @@ def test_register(client):
 def test_login(client, test_user):
 
     response = client.post("/api/auth/login", json={
-        "email": "admin3@admin.com",
+        "email": test_user.email,
         "password": "123456"
     })
 

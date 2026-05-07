@@ -3,6 +3,9 @@ from .config import Config
 from .extensions import db, migrate, jwt, bcrypt, mail
 from app.routes.auth_routes import auth_bp
 
+from flask import make_response
+from flask_cors import CORS
+
 from .models.user import User
 from .models.token_blocklist import TokenBlocklist
 from .models.category import Category
@@ -25,6 +28,20 @@ def check_if_token_revoked(jwt_header, jwt_payload):
 
 def create_app(config=None):
     app = Flask(__name__)
+
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        supports_credentials=True
+    )
+
+    @app.after_request
+    def after_request(response):
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+        return response
+
 
     if config == "testing":
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"

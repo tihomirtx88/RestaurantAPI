@@ -37,7 +37,7 @@ def client(app):
 @pytest.fixture
 def test_user(app):
     user = User(
-        email=f"admin_{uuid.uuid4()}@admin.com",  # ← FIX
+        email="admin@admin.com",
         role="admin"
     )
     user.set_password("123456")
