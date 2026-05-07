@@ -131,3 +131,18 @@ def update_menu_item(id):
 
     db.session.commit()
     return menu_schema.dump(item), 200
+
+# -------------------------
+# DELETE MENU ITEM
+# -------------------------
+@menu_bp.route("/<int:id>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_menu_item(id):
+
+    item = MenuItem.query.get_or_404(id)
+
+    db.session.delete(item)
+    db.session.commit()
+
+    return {"message": "Deleted"}, 200
