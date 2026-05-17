@@ -47,7 +47,8 @@ def login():
     return {
         "access_token": access_token,
         "user_id": user.id,
-        "refresh_token": refresh_token
+        "refresh_token": refresh_token,
+        "role": user.role
     }, 200
 
 @auth_bp.route("/profile", methods=["GET"])
