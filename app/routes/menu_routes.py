@@ -1,0 +1,148 @@
+from functools import partial
+
+from flask import Blueprint, request
+from app.models.menu_item import MenuItem
+from app.models.category import Category
+from app.shcemas.menu_schema import MenuItemSchema
+from app.extensions import db
+from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
+
+from app.utilis.error_handler import AppError
+
+from app.utilis.permissions import role_required
+
+menu_bp = Blueprint("menu", __name__, url_prefix="/api/menu")
+
+# Schema instances
+menu_schema = MenuItemSchema()
+menus_schema = MenuItemSchema(many=True)
+
+# -------------------------
+# GET ALL MENU ITEMS
+# -------------------------
+@menu_bp.route("/", methods=["GET"])
+def get_menu():
+
+    category_name = request.args.get("category")
+
+    query = MenuItem.query
+
+    if category_name:
+        category = Category.query.filter(
+            db.func.lower(Category.name) == category_name.lower()
+        ).first()
+
+        if not category:
+            raise AppError("Category not found", 404)
+
+        query = query.filter_by(category_id=category.id)
+
+    items = query.all()
+
+    return menus_schema.dump(items), 200
+
+# -------------------------
+# GET ALL MENU ITEMS WITH FILTERING
+# -------------------------
+
+@menu_bp.route("/filter", methods=["GET"])
+def get_filter_menu():
+
+    category_name = request.args.get("category")
+    min_price = request.args.get("min_price")
+    max_price = request.args.get("max_price")
+    sort = request.args.get("sort", "id")
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 5, type=int)
+
+    query = MenuItem.query
+
+    if category_name:
+        category = Category.query.filter(
+            db.func.lower(Category.name) == category_name.lower()
+        ).first()
+        if category:
+            query = query.filter_by(category_id=category.id)
+
+    if min_price:
+        query = query.filter(MenuItem.price >= float(min_price))
+
+    if max_price:
+        try:
+            query = query.filter(MenuItem.price <= float(max_price))
+        except ValueError:
+            raise AppError("Invalid max_price", 400)
+
+    if sort == "price":
+        query = query.order_by(MenuItem.price)
+    elif sort == "name":
+        query = query.order_by(MenuItem.name)
+    else:
+        query = query.order_by(MenuItem.id)
+
+    paginated = query.paginate(page=page, per_page= per_page, error_out=False)
+
+    return {
+        "items": menus_schema.dump(paginated.items),
+        "total": paginated.total,
+        "page": paginated.page,
+        "pages": paginated.pages
+    }, 200
+
+@menu_bp.route("/", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_menu_item():
+
+    data = request.get_json()
+
+    if not data:
+        raise AppError("No input data", 400)
+
+    try:
+        item = menu_schema.load(data)
+    except ValidationError as err:
+        raise AppError(err.messages, 400)
+
+    db.session.add(item)
+    db.session.commit()
+
+    return menu_schema.dump(item), 201
+
+# -------------------------
+# UPDATE MENU ITEM
+# -------------------------
+@menu_bp.route("/<int:id>", methods=["PATCH"])
+@jwt_required()
+@role_required("admin")
+def update_menu_item(id):
+
+    item = MenuItem.query.get_or_404(id);
+    data = request.get_json()
+
+    try:
+        updated = menu_schema.load(data, partial=True)
+    except ValidationError as err:
+        raise AppError(err.messages, 400)
+
+    for key, value in data.items():
+        setattr(item, key, value)
+
+    db.session.commit()
+    return menu_schema.dump(item), 200
+
+# -------------------------
+# DELETE MENU ITEM
+# -------------------------
+@menu_bp.route("/<int:id>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_menu_item(id):
+
+    item = MenuItem.query.get_or_404(id)
+
+    db.session.delete(item)
+    db.session.commit()
+
+    return {"message": "Deleted"}, 200
