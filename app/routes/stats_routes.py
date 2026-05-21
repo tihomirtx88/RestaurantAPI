@@ -1,13 +1,18 @@
 from flask import Blueprint
+from flask_jwt_extended import jwt_required
+
 from app.models.reservation import Reservation
 from app.models.review import Review
 from app.models.menu_item import MenuItem
 from app.extensions import db
 from app.utilis.cache import get_cache, set_cache
+from app.utilis.permissions import role_required
 
 stats_bp = Blueprint("stats", __name__, url_prefix="/api/stats")
 
 @stats_bp.route("/", methods=["GET"])
+@jwt_required()
+@role_required("admin")
 def get_stats():
 
     cached = get_cache("stats")

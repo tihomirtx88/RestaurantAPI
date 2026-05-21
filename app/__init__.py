@@ -31,17 +31,16 @@ def create_app(config=None):
 
     CORS(
         app,
-        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        resources={
+            r"/api/*": {
+                "origins": [
+                    "http://localhost:5173",
+                    "http://localhost:5174"
+                ]
+            }
+        },
         supports_credentials=True
     )
-
-    @app.after_request
-    def after_request(response):
-        response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
-        response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
-        return response
-
 
     if config == "testing":
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
@@ -72,3 +71,4 @@ def create_app(config=None):
     app.register_blueprint(stats_bp)
 
     return app
+
