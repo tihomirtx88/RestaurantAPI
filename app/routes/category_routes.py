@@ -28,6 +28,7 @@ def get_categories():
 
 
 @category_bp.route("/", methods=["POST"])
+@jwt_required()
 @role_required("admin")
 def create_category():
     data = request.get_json()
