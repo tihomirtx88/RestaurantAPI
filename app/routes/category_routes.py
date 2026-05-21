@@ -58,3 +58,19 @@ def delete_category(id):
     db.session.commit()
 
     return {"message": "Deleted"}, 200
+
+@category_bp.route("/<int:id>", methods=["PATCH"])
+@jwt_required()
+@role_required("admin")
+def update_category(id):
+
+    category = Category.query.get_or_404(id)
+
+    data = request.get_json()
+
+    for key, value in data.items():
+        setattr(category, key, value)
+
+    db.session.commit()
+
+    return  category_schema.dump(category), 200
