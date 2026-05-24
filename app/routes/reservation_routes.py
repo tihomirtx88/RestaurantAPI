@@ -53,7 +53,7 @@ def delete_reservation(id):
 
     reservation = Reservation.query.get_or_404(id)
 
-    if reservation.user_id != int(user_id)
+    if reservation.user_id != int(user_id):
         raise AppError("Unauthorized", 403)
 
     db.session.delete(reservation)
