@@ -20,3 +20,6 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
+
+    UPLOAD_FOLDER = "uploads"
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
