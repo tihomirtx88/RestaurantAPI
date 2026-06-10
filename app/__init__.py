@@ -2,6 +2,7 @@ from flask import Flask
 from .config import Config
 from .extensions import db, migrate, jwt, bcrypt, mail
 from app.routes.auth_routes import auth_bp
+from flask import send_from_directory
 
 from flask import make_response
 from flask_cors import CORS
@@ -18,6 +19,8 @@ from .routes.review_routes import review_bp
 from .routes.menu_routes import menu_bp
 from .routes.reservation_routes import reservation_bp
 from .routes.stats_routes import stats_bp
+
+from .routes.upload_routes import upload_bp
 
 from app.utilis.error_handler import register_error_handlers
 
@@ -63,12 +66,20 @@ def create_app(config=None):
     def home():
         return {"message": "Restaurant API running 🚀"}
 
+    @app.route("/uploads/<path:filename>")
+    def uploaded_file(filename):
+        return send_from_directory(
+            app.config["UPLOAD_FOLDER"],
+            filename
+        )
+
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(category_bp)
     app.register_blueprint(menu_bp)
     app.register_blueprint(review_bp)
     app.register_blueprint(reservation_bp)
     app.register_blueprint(stats_bp)
+    app.register_blueprint(upload_bp)
 
     return app
 
