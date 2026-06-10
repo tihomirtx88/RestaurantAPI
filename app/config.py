@@ -22,4 +22,5 @@ class Config:
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
 
     UPLOAD_FOLDER = "uploads"
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
