@@ -1,4 +1,6 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
+
 from app.models.category import Category
 from app.shcemas.category_schema import CategorySchema
 from app.extensions import db
@@ -26,6 +28,7 @@ def get_categories():
 
 
 @category_bp.route("/", methods=["POST"])
+@jwt_required()
 @role_required("admin")
 def create_category():
     data = request.get_json()
@@ -44,3 +47,31 @@ def create_category():
     db.session.commit()
 
     return category_schema.dump(category), 201
+
+@category_bp.route("/<int:id>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_category(id):
+
+    category = Category.query.get_or_404(id)
+
+    db.session.delete(category)
+    db.session.commit()
+
+    return {"message": "Deleted"}, 200
+
+@category_bp.route("/<int:id>", methods=["PATCH"])
+@jwt_required()
+@role_required("admin")
+def update_category(id):
+
+    category = Category.query.get_or_404(id)
+
+    data = request.get_json()
+
+    for key, value in data.items():
+        setattr(category, key, value)
+
+    db.session.commit()
+
+    return  category_schema.dump(category), 200

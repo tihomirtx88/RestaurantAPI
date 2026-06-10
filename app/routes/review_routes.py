@@ -42,3 +42,49 @@ def get_reviews(menu_id):
     reviews = Review.query.filter_by(menu_item_id=menu_id).all()
 
     return reviews_schema.dump(reviews), 200
+
+@review_bp.route("/<int:id>", methods=["DELETE"])
+@jwt_required()
+def delete_review(id):
+
+    user_id = get_jwt_identity()
+
+    review = Review.query.get_or_404(id)
+
+    # Ownership checks
+    if review.user_id != int(user_id):
+        raise AppError("Unauthorized", 403)
+
+    db.session.delete(review)
+    db.session.commit()
+
+    return {"message": "Deleted"}, 200
+
+@review_bp.route("/<int:id>", methods=["PATCH"])
+@jwt_required()
+def update_review(id):
+
+    user_id = get_jwt_identity()
+
+    review = Review.query.get_or_404(id)
+
+    # ownership check
+    if review.user_id != int(user_id):
+        raise AppError("Unauthorized", 403)
+
+    data = request.get_json()
+
+    try:
+        updated = review_schema.load(
+            data,
+            partial=True
+        )
+    except ValidationError as err:
+        raise AppError(err.messages, 400)
+
+    for key, value in data.items():
+        setattr(review, key, value)
+
+    db.session.commit()
+
+    return review_schema.dump(review), 200

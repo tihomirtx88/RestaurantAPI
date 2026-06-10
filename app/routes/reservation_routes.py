@@ -44,3 +44,19 @@ def get_my_reservations():
     reservations = Reservation.query.filter_by(user_id=user_id).all()
 
     return reservations_schema.dump(reservations), 200
+
+@reservation_bp.route("/<int:id>", methods=["DELETE"])
+@jwt_required()
+def delete_reservation(id):
+
+    user_id = get_jwt_identity()
+
+    reservation = Reservation.query.get_or_404(id)
+
+    if reservation.user_id != int(user_id):
+        raise AppError("Unauthorized", 403)
+
+    db.session.delete(reservation)
+    db.session.commit()
+
+    return {"message": "Deleted"}, 200
